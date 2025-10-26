@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,6 +36,10 @@ async def lifespan(app: FastAPI):
     yield  # runs while app is active
 
 app = FastAPI(lifespan=lifespan)
+
+@app.get("/")
+def root():
+    return {"service": "code-review-as-a-service", "docs": "/docs", "health": "/healthz"}
 
 @app.get("/healthz")
 def healthz():

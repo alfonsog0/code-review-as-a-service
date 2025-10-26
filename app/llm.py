@@ -30,16 +30,17 @@ def review_code(language: str, code: str, lines: Optional[str]) -> Dict:
     Call OpenAI to review code and return a dict matching ReviewPayload.
     """
     user_msg = USER_TEMPLATE.format(language=language, code=code, lines=lines or "(none)")
-    resp = _client_singleton().responses.create(
+    client = _client_singleton()
+    resp = client.chat.completions.create(
         model=_OPENAI_MODEL,
         temperature=0.2,
         response_format={"type": "json_object"},
-        input=[
+        messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_msg},
         ],
     )
-    text = resp.output_text
+    text = resp.choices[0].message.content or "{}"
     try:
         data = json.loads(text)
     except json.JSONDecodeError:
@@ -49,7 +50,6 @@ def review_code(language: str, code: str, lines: Optional[str]) -> Dict:
             "findings": [],
             "rating": 5,
         }
-    # Fill required keys if missing
     data.setdefault("summary", "")
     data.setdefault("suggestions", [])
     data.setdefault("findings", [])
