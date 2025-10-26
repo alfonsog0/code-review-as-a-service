@@ -25,3 +25,8 @@ htmlcov/
 # Logs/PIDs
 *.log
 *.pid
+
+# Environment variables
+.env
+.env.*
+
